@@ -46,6 +46,33 @@ public class MainActivity extends AppCompatActivity {
             final String str = "Imei number: " + telephonyManager.getDeviceId();
             imeiTextView.setText(str);
         }
+        System.out.println("ABC");
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED)
+        {
+            // Should we show an explanation?
+           /* if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET))
+            {
+
+            }
+            else {*/
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.INTERNET},3);
+            //}
+        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED)
+        {
+            // Should we show an explanation?
+           /* if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.INTERNET))
+            {
+
+            }
+            else {*/
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_NETWORK_STATE},5);
+            //}
+        }
+        System.out.println("DEF");
+        Thread t = new Thread(new ServerConnection());
+        t.start();
+
     }
 
 }
