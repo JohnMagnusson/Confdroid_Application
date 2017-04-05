@@ -1,22 +1,13 @@
 package com.bykth.confdroid.confdroid_application;
 
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by Elias on 2017-04-03.
+ * Connection between the application and the server is handled in this class.
  */
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.system.Os;
-import android.telephony.TelephonyManager;
-import org.apache.http.conn.*;
+import com.bykth.confdroid.confdroid_application.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 
