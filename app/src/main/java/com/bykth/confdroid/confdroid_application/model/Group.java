@@ -1,7 +1,7 @@
-package com.bykth.confdroid.confdroid_application;
+package com.bykth.confdroid.confdroid_application.model;
 
 /**
- * Created by Elias on 2017-04-05.
+ * User can be in groups and have different settings depending on the groups set standard.
  */
 public class Group
 {

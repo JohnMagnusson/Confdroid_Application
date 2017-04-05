@@ -1,7 +1,7 @@
-package com.bykth.confdroid.confdroid_application;
+package com.bykth.confdroid.confdroid_application.model;
 
 /**
- * Created by Elias on 2017-04-05.
+ * User have a name and email.
  */
 public class User
 {
