@@ -51,36 +51,27 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 
     private void printJsonFromServer()
     {
-        System.out.println("Start");
-        ServerConnection serverCon = new ServerConnection();
-        serverCon.fetch("Hej", "aa");
-        System.out.println("Past start");
-        synchronized(serverCon.retrievedUpdates)
-        {
-            System.out.println("Wow");
-            if(serverCon.retrievedUpdates == null) {
-                try {
-                    System.out.println("1");
-                    serverCon.retrievedUpdates.wait();
-                    System.out.println("2");
-                } catch (InterruptedException e) {
-                    System.out.println("Failed in printJsonFromServer func: " + e.getMessage());
-                }
+        final ServerConnection serverCon = new ServerConnection();
+        final String imei = imeiTextView.getText().toString();
+        Thread a = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                serverCon.fetch(imei, "aa");
             }
-            else
-            {
-                JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
-                try {
-                    System.out.println("Is it null now?: " + retrievedInfo);
-                    nameTextView.append(retrievedInfo.getString("name"));
-                    emailTextView.append(retrievedInfo.getString("email"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+        });
+        a.start();
+        try {
+            a.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-//        notifyAll();
+        JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
+        try {
+            nameTextView.setText("Name: " + retrievedInfo.getString("name"));
+            emailTextView.setText("Email: " + retrievedInfo.getString("email"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void getPermissionToReadPhoneState()
