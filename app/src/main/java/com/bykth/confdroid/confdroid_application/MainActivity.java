@@ -12,11 +12,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     final private int REQUEST_CODE_READ_PHONE_STATE = 1;
     private TextView imeiTextView;
+    private TextView nameTextView;
+    private TextView emailTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -31,16 +36,51 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     {
         super.onStart();
         imeiTextView = (TextView) findViewById(R.id.imeiTextView);
+        nameTextView = (TextView) findViewById(R.id.nameText);
+        emailTextView = (TextView) findViewById(R.id.emailText);
         getPermissionToReadPhoneState();
         Button fetchButton = (Button) findViewById(R.id.button);
 
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Thread t = new Thread(new ServerConnection());
-                t.start();
+                printJsonFromServer();
             }
         });
+    }
+
+    private void printJsonFromServer()
+    {
+        System.out.println("Start");
+        ServerConnection serverCon = new ServerConnection();
+        serverCon.fetch("Hej", "aa");
+        System.out.println("Past start");
+        synchronized(serverCon.retrievedUpdates)
+        {
+            System.out.println("Wow");
+            if(serverCon.retrievedUpdates == null) {
+                try {
+                    System.out.println("1");
+                    serverCon.retrievedUpdates.wait();
+                    System.out.println("2");
+                } catch (InterruptedException e) {
+                    System.out.println("Failed in printJsonFromServer func: " + e.getMessage());
+                }
+            }
+            else
+            {
+                JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
+                try {
+                    System.out.println("Is it null now?: " + retrievedInfo);
+                    nameTextView.append(retrievedInfo.getString("name"));
+                    emailTextView.append(retrievedInfo.getString("email"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+//        notifyAll();
     }
 
     public void getPermissionToReadPhoneState()
