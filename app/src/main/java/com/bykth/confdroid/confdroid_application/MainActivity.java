@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.bykth.confdroid.confdroid_application.model.Device;
+import com.bykth.confdroid.confdroid_application.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
@@ -19,9 +21,11 @@ import org.w3c.dom.Text;
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     final private int REQUEST_CODE_READ_PHONE_STATE = 1;
+    private String imei;
     private TextView imeiTextView;
     private TextView nameTextView;
     private TextView emailTextView;
+    private TextView deviceTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         imeiTextView = (TextView) findViewById(R.id.imeiTextView);
         nameTextView = (TextView) findViewById(R.id.nameText);
         emailTextView = (TextView) findViewById(R.id.emailText);
+        deviceTextView = (TextView) findViewById(R.id.deviceText);
         getPermissionToReadPhoneState();
         Button fetchButton = (Button) findViewById(R.id.button);
 
@@ -52,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     private void printJsonFromServer()
     {
         final ServerConnection serverCon = new ServerConnection();
-        final String imei = imeiTextView.getText().toString();
+//        System.out.println("imei: " + imei);
         Thread a = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -67,8 +72,11 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         }
         JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
         try {
+
+            User user = new User(retrievedInfo.getString("name"), retrievedInfo.getString("email"), new Device());
             nameTextView.setText("Name: " + retrievedInfo.getString("name"));
             emailTextView.setText("Email: " + retrievedInfo.getString("email"));
+            deviceTextView.setText("Device: " + retrievedInfo.getString("devices"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -90,7 +98,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         else
         {
             TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-            final String str = "Imei number: " + telephonyManager.getDeviceId();
+            imei = telephonyManager.getDeviceId();
+            final String str = "Imei number: " + imei;
             imeiTextView.setText(str);
         }
     }

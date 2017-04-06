@@ -38,4 +38,9 @@
             android:layout_marginTop="47dp"
             android:id="@+id/nameText" tools:text="Name:" android:layout_below="@+id/button"
             android:layout_alignEnd="@+id/emailText"/>
+    <TextView
+            android:text="Device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_below="@+id/emailText"
+            android:layout_alignStart="@+id/nameText" android:layout_marginTop="39dp" android:id="@+id/deviceText"/>
 </RelativeLayout>
