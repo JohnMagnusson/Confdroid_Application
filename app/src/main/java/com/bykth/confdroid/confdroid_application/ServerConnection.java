@@ -37,8 +37,10 @@ public class ServerConnection
             reader = new BufferedReader(new InputStreamReader(in));
             result = reader.readLine();
             System.out.println("I read this: " + result);
+            retrievedUpdates = new JSONObject(result);
+            System.out.println(retrievedUpdates.getString("name") + " " + retrievedUpdates.getString("email"));
         }
-        catch(IOException e)
+        catch(Exception e)
         {
             System.out.println("It went wrong: " + e.getMessage());
         }
@@ -51,12 +53,6 @@ public class ServerConnection
             }
         }
 
-        try {
-            retrievedUpdates = new JSONObject(result);
-            System.out.println(retrievedUpdates.getString("name") + " " + retrievedUpdates.getString("email"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     public JSONObject getRetrievedUpdates()

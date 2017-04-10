@@ -18,6 +18,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.text.DateFormat;
+import java.util.Date;
+
+
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     final private int REQUEST_CODE_READ_PHONE_STATE = 1;
@@ -26,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     private TextView nameTextView;
     private TextView emailTextView;
     private TextView deviceTextView;
+    private TextView statusTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         nameTextView = (TextView) findViewById(R.id.nameText);
         emailTextView = (TextView) findViewById(R.id.emailText);
         deviceTextView = (TextView) findViewById(R.id.deviceText);
+        statusTextView = (TextView) findViewById(R.id.statusText);
         getPermissionToReadPhoneState();
         Button fetchButton = (Button) findViewById(R.id.button);
 
@@ -59,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
      */
     private void printJsonFromServer()
     {
+        statusTextView.setText("Status: Fetching data from server");
         final ServerConnection serverCon = new ServerConnection();
         Thread serverThread = new Thread(new Runnable() {
             @Override
@@ -73,14 +80,23 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
+
         try {
+            JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
             //Retrieves info from jsonobject and puts it in the textviews
-            User user = new User(retrievedInfo.getString("name"), retrievedInfo.getString("email"), new Device());
-            nameTextView.setText("Name: " + retrievedInfo.getString("name"));
-            emailTextView.setText("Email: " + retrievedInfo.getString("email"));
-            deviceTextView.setText("Device: " + retrievedInfo.getString("devices"));
-        } catch (JSONException e) {
+            if(retrievedInfo!= null) {
+                User user = new User(retrievedInfo.getString("name"), retrievedInfo.getString("email"), new Device());
+                nameTextView.setText("Name: " + retrievedInfo.getString("name"));
+                emailTextView.setText("Email: " + retrievedInfo.getString("email"));
+                deviceTextView.setText("Device: " + retrievedInfo.getString("devices"));
+                statusTextView.setText("Status: Updates downloaded at " + DateFormat.getDateTimeInstance().format(new Date()));
+            }else{
+                nameTextView.setText("");
+                emailTextView.setText("");
+                deviceTextView.setText("");
+                statusTextView.setText("Status: Could not fetch data");
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
