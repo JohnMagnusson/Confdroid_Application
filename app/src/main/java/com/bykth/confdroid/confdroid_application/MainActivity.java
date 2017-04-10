@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        System.out.println("Hello");
         setContentView(R.layout.activity_main);
     }
 
@@ -39,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     protected void onStart()
     {
         super.onStart();
+        //gets all the textviews from the activity_main.xml file
         imeiTextView = (TextView) findViewById(R.id.imeiTextView);
         nameTextView = (TextView) findViewById(R.id.nameText);
         emailTextView = (TextView) findViewById(R.id.emailText);
@@ -54,25 +54,28 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         });
     }
 
+    /**
+     * Creates a serverconnection and fetches an user which is then printed out on screen
+     */
     private void printJsonFromServer()
     {
         final ServerConnection serverCon = new ServerConnection();
-//        System.out.println("imei: " + imei);
-        Thread a = new Thread(new Runnable() {
+        Thread serverThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 serverCon.fetch(imei, "aa");
             }
         });
-        a.start();
+        serverThread.start();
         try {
-            a.join();
+            //Waits here until serverThread is done
+            serverThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
         try {
-
+            //Retrieves info from jsonobject and puts it in the textviews
             User user = new User(retrievedInfo.getString("name"), retrievedInfo.getString("email"), new Device());
             nameTextView.setText("Name: " + retrievedInfo.getString("name"));
             emailTextView.setText("Email: " + retrievedInfo.getString("email"));
@@ -82,19 +85,26 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         }
     }
 
-    public void getPermissionToReadPhoneState()
+    /**
+     * Asks for permission to read phone state (imei)
+     */
+    private void getPermissionToReadPhoneState()
     {
+        //Checks if we already have permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
         {
-            // Should we show an explanation?
+            //If the user declined the first time, we ask again, but this time we could show an explination
+            //of why we need permission
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE))
             {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
             }
+            //The first time we ask
             else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
             }
         }
+        //If we have permission, get imei
         else
         {
             TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
@@ -110,12 +120,15 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         switch(requestCode)
         {
             case 1:
+                //If user grants permission, get imei
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                    final String str = "Imei number: " + telephonyManager.getDeviceId();
+                    imei = telephonyManager.getDeviceId();
+                    final String str = "Imei number: " + imei;
                     imeiTextView.setText(str);
                 }
+                //If user declines permission
                 else
                 {
                     System.out.println("Fail!");

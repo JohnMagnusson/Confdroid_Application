@@ -14,20 +14,23 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class ServerConnection
 {
-    public JSONObject retrievedUpdates;
-    private String imei = "1234";
+    private JSONObject retrievedUpdates;
 
     public ServerConnection()
     {
 
     }
 
+    /**
+     * Fetches an user from the server with the imei number.
+     * @param imei
+     * @param versionHash
+     */
     public void fetch(String imei, String versionHash)
     {
         String result = "";
         BufferedReader reader = null;
         try {
-            System.out.println("IMEI: " + imei);
             URL url = new URL("https://confdroid.tutus.se/api/user.json?userAuth=testToken&imei=" + imei);
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             InputStream in = new BufferedInputStream(connection.getInputStream());
