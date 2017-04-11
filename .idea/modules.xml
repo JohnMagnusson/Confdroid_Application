@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-
-      <module fileurl="file://$PROJECT_DIR$/Confdroid_Application.iml" filepath="$PROJECT_DIR$/Confdroid_Application.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Confdroid_Application.iml" filepath="$PROJECT_DIR$/Confdroid_Application.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Confdroid_Application.iml" filepath="$PROJECT_DIR$/.idea/Confdroid_Application.iml" />
       <module fileurl="file://C:\Users\johnv\OneDrive\Dokument\Skola\Projektarbete\Applikation\Confdroid_Application\.idea\modules\Confdroid_Application.iml" filepath="C:\Users\johnv\OneDrive\Dokument\Skola\Projektarbete\Applikation\Confdroid_Application\.idea\modules\Confdroid_Application.iml" />
+      <module fileurl="file://C:\Users\swehu\intellij\Confdroid_Application\Confdroid_Application.iml" filepath="C:\Users\swehu\intellij\Confdroid_Application\Confdroid_Application.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-
     </modules>
   </component>
 </project>

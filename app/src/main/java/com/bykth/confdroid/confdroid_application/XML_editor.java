@@ -1,6 +1,10 @@
 package com.bykth.confdroid.confdroid_application;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  * Created by Glantz on 2017-04-10.
  */

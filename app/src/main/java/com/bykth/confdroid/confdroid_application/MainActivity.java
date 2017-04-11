@@ -8,6 +8,7 @@ import android.telephony.TelephonyManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.bykth.confdroid.confdroid_application.model.Device;
 import com.bykth.confdroid.confdroid_application.model.User;
 import org.json.JSONObject;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 printJsonFromServer();
             }
         });
-
+        Toast.makeText(getBaseContext(), "Toast", Toast.LENGTH_LONG).show();
 
     }
 

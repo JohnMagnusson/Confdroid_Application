@@ -1,5 +1,6 @@
 package com.bykth.confdroid.confdroid_application.model;
 
+import com.bykth.confdroid.confdroid_application.AppParser;
 import com.bykth.confdroid.confdroid_application.ServerConnection;
 
 /**
