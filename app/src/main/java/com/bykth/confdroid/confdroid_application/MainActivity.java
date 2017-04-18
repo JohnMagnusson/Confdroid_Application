@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private String imei;
     private TextView imeiTextView;
-    private TextView nameTextView;
     private TextView emailTextView;
+    private TextView nameTextView;
     private TextView deviceTextView;
     private TextView statusTextView;
 
