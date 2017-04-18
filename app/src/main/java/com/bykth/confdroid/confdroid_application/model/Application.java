@@ -1,31 +1,33 @@
 package com.bykth.confdroid.confdroid_application.model;
 
+import java.util.ArrayList;
+
 /**
  * This class stores data of an app.
  * Settings, if it should be force installed, data directory, apk name and apk url.
  */
 public class Application
 {
-    private SQL_Setting sql_setting;
-    private XML_Setting xml_setting;
+    private ArrayList<SQL_Setting> sql_settings;
+    private ArrayList<XML_Setting> xml_settings;
     private boolean force_install;
     private String dataDir;
     private String apkName;
     private String apkUrl;
+    private String friendlyName;
 
     /**
      * This class stores data of an app.
-     * @param sql_setting SQL_Settings for the app.
-     * @param xml_setting XML_Settings for the app.
      * @param force_install If th app should be force installed.
      * @param dataDir Where the app is stored.
      * @param apkName Name of the apk.
      * @param apkUrl Url to the apk.
      */
-    public Application(SQL_Setting sql_setting, XML_Setting xml_setting, boolean force_install, String dataDir, String apkName, String apkUrl)
+    public Application(String friendlyName, boolean force_install, String dataDir, String apkName, String apkUrl)
     {
-        this.sql_setting = sql_setting;
-        this.xml_setting = xml_setting;
+        this.friendlyName = friendlyName;
+        this.sql_settings = new ArrayList();
+        this.xml_settings = new ArrayList();
         this.force_install = force_install;
         this.dataDir = dataDir;
         this.apkName = apkName;
@@ -35,14 +37,22 @@ public class Application
     /**
      * @return SQL_Setting
      */
-    public SQL_Setting getSql_setting() {
-        return sql_setting;
+    public ArrayList<SQL_Setting> getSqlSettings() {
+        return (ArrayList<SQL_Setting>) sql_settings.clone();
     }
     /**
      * @return XML_Setting
      */
-    public XML_Setting getXml_setting() {
-        return xml_setting;
+    public ArrayList<XML_Setting> getXmlSettings() {
+        return (ArrayList<XML_Setting>) xml_settings.clone();
+    }
+
+    public void addSqlSetting(SQL_Setting sqlSetting) {
+        this.sql_settings.add(sqlSetting);
+    }
+
+    public void addXmlSetting(XML_Setting xmlSetting) {
+        this.xml_settings.add(xmlSetting);
     }
     /**
      * @return boolean
@@ -67,5 +77,9 @@ public class Application
      */
     public String getApkUrl() {
         return apkUrl;
+    }
+
+    public String getFriendlyName() {
+        return friendlyName;
     }
 }

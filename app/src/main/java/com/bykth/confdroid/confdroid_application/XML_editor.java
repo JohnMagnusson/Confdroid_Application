@@ -1,20 +1,31 @@
 package com.bykth.confdroid.confdroid_application;
 
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import android.content.Context;
+
+import java.io.*;
 
 /**
  * Created by Glantz on 2017-04-10.
  */
 public class XML_editor {
 
+    private Context context;
 
-    public void ApplyXMLSetting(String filepath, String regexCommand, String replaceWith) throws IOException {
-        FileOutputStream stream = new FileOutputStream("/Users/Glantz/Desktop/KTH/projektkurs åk2/KOD/tmp.xml");
+    public XML_editor(Context context) {
+        this.context = context;
+    }
+
+    /**
+     * @param filepath     The filepath including
+     * @param regexCommand
+     * @param replaceWith
+     * @throws IOException
+     */
+    public boolean ApplyXMLSetting(String filepath, String regexCommand, String replaceWith) throws IOException {
 
         String tmp = readFileAsString(filepath).replaceAll(regexCommand, replaceWith);
+
+        FileOutputStream stream = new FileOutputStream(context.getFilesDir() + "/tmp.xml");
 
         try {
             stream.write(tmp.getBytes());
@@ -22,6 +33,36 @@ public class XML_editor {
             e.printStackTrace();
         } finally {
             stream.close();
+        }
+
+        return moveFileToApp(context.getFilesDir() + "/tmp.xml", filepath);
+
+
+    }
+
+    private boolean moveFileToApp(String tmpFilepath, String applicationFilepath) {
+        try {
+            Process proc = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(proc.getOutputStream());
+            os.writeBytes("cat " + tmpFilepath + " > " + applicationFilepath + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(proc.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(proc.getErrorStream()));
+
+            // wait for the output from the command
+            String s = null;
+            while ((s = stdInput.readLine()) != null) ;
+            // wait for any errors from the attempted command
+
+            while ((s = stdError.readLine()) != null) ;
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
 
 

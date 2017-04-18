@@ -6,16 +6,16 @@ package com.bykth.confdroid.confdroid_application.model;
 public class SQL_Setting
 {
     private String dbLocation;
-    private String dbQueries;
+    private String dbQuerry;
 
     /**
      * @param dbLocation Location of the database, URL
-     * @param dbQueries Queries to the database.
+     * @param dbQuerry Queries to the database.
      */
-    public SQL_Setting(String dbLocation, String dbQueries)
+    public SQL_Setting(String dbLocation, String dbQuerry)
     {
         this.dbLocation = dbLocation;
-        this.dbQueries = dbQueries;
+        this.dbQuerry = dbQuerry;
     }
 
     /**
@@ -29,8 +29,8 @@ public class SQL_Setting
     /**
      * @return String
      */
-    public String getDbQueries()
+    public String getDbQuerry()
     {
-        return dbQueries;
+        return dbQuerry;
     }
 }

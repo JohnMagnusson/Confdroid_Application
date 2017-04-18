@@ -11,10 +11,10 @@ import java.net.URLConnection;
 /**
  * Created by Mattias Kågström on 2017-04-10.
  */
-public class sqlite3 {
+public class SQLHandler {
 
 
-    public sqlite3() {
+    public SQLHandler() {
         File varTmpDir = new File("/system/bin/sqlite3");
         boolean exists = varTmpDir.exists();
         if (exists) {
@@ -28,13 +28,35 @@ public class sqlite3 {
 
     public void runQuery(String DBFile, String SQLQuerry) throws IOException {
         try {
-            Runtime.getRuntime().exec("su sqlite3 -csv " + DBFile + " \"" + SQLQuerry + "\";");
+            SQLQuerry = SQLQuerry.replaceAll("\"", "\\\"");
+            Process proc = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(proc.getOutputStream());
+            os.writeBytes("sqlite3 -csv " + DBFile + " '" + SQLQuerry + ";'\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(proc.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(proc.getErrorStream()));
+
+// read the output from the command
+            System.out.println("Here is the standard output of the command:\n");
+            String s = null;
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+            }
+
+// read any errors from the attempted command
+            System.out.println("Here is the standard error of the command (if any):\n");
+            while ((s = stdError.readLine()) != null) {
+                System.out.println(s);
+            }
+
         } catch (IOException e) {
             throw e;
         }
-
     }
-
 
     protected void runInstallation() {
         System.out.println("Running installation");
@@ -43,7 +65,6 @@ public class sqlite3 {
 
             // Preform su to get root privileges
             p = Runtime.getRuntime().exec("su");
-
             // Attempt to write a file to a root-only
             DataOutputStream os = new DataOutputStream(p.getOutputStream());
             System.out.println("Trying to install SQLite3 into /system/bin");
@@ -77,9 +98,9 @@ public class sqlite3 {
 
 class DownloadFileFromURL extends AsyncTask<String, String, String> {
 
-    private sqlite3 caller;
+    private SQLHandler caller;
 
-    public DownloadFileFromURL(sqlite3 caller) {
+    public DownloadFileFromURL(SQLHandler caller) {
         this.caller = caller;
     }
 
