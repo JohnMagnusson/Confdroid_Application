@@ -16,11 +16,21 @@ public class AppParser
     private ArrayList<Application> applications = new ArrayList<>();
     private Context context;
 
+    /**
+     * Initilizes the class with the list of applications to be parsed, and the cantext of the main actvity
+     *
+     * @param applications
+     * @param context
+     */
     public AppParser(ArrayList<Application> applications, Context context) {
         this.applications = applications;
         this.context = context;
     }
 
+
+    /**
+     * Parses all the apps supplied in the constructor and applies their settings.
+     */
     public void parse() {
         final ArrayList<Application> applications = this.applications;
         Thread parseThread = new Thread(new Runnable() {

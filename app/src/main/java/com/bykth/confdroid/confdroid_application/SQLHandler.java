@@ -13,7 +13,10 @@ import java.net.URLConnection;
  */
 public class SQLHandler {
 
-
+    /**
+     * Initilizies the sql handler, and cheks if sqlite3 is installed. if not, it will install it on the system.
+     * REQUIRES ROOT!!!
+     */
     public SQLHandler() {
         File varTmpDir = new File("/system/bin/sqlite3");
         boolean exists = varTmpDir.exists();
@@ -26,6 +29,13 @@ public class SQLHandler {
 
     }
 
+    /**
+     * Runs a sql query on the selected sqlite file.
+     *
+     * @param DBFile    the file to run the query on.
+     * @param SQLQuerry The query to run on the file.
+     * @throws IOException
+     */
     public void runQuery(String DBFile, String SQLQuerry) throws IOException {
         try {
             SQLQuerry = SQLQuerry.replaceAll("\"", "\\\"");
