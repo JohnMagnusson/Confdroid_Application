@@ -9,11 +9,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.bykth.confdroid.confdroid_application.model.Device;
+import com.bykth.confdroid.confdroid_application.model.Application;
 import com.bykth.confdroid.confdroid_application.model.User;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -27,11 +27,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView deviceTextView;
     private TextView statusTextView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
     @Override
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     /**
      * Creates a serverconnection and fetches an user which is then printed out on screen
      */
@@ -65,29 +68,23 @@ public class MainActivity extends AppCompatActivity {
     {
         statusTextView.setText("Status: Fetching data from server");
         final ServerConnection serverCon = new ServerConnection();
-        Thread serverThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                serverCon.fetch(imei, "aa");
-            }
-        });
-        serverThread.start();
         try {
-            //Waits here until serverThread is done
-            serverThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            User user = serverCon.fetchUser(imei);
+            if (user != null) {
+                nameTextView.setText("Name: " + user.getName());
+                emailTextView.setText("Email: " + user.getEmail());
 
-        try {
-            JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
-            //Retrieves info from jsonobject and puts it in the textviews
-            if(retrievedInfo!= null) {
-                User user = new User(retrievedInfo.getString("name"), retrievedInfo.getString("email"), new Device());
-                nameTextView.setText("Name: " + retrievedInfo.getString("name"));
-                emailTextView.setText("Email: " + retrievedInfo.getString("email"));
-                deviceTextView.setText("Device: " + retrievedInfo.getString("devices"));
                 statusTextView.setText("Status: Updates downloaded at " + DateFormat.getDateTimeInstance().format(new Date()));
+                if (!user.getDevices().isEmpty()) {
+                    deviceTextView.setText("Device: " + user.getDevices().get(0).getName());
+                    ArrayList<Application> apps = user.getDevices().get(0).getApplications();
+                    for (Application app : apps) {
+                        System.out.println(app.getFriendlyName());
+                    }
+                    AppParser appParser = new AppParser(apps, this);
+                    appParser.parse();
+                }
+
             }else{
                 nameTextView.setText("");
                 emailTextView.setText("");
@@ -104,6 +101,6 @@ public class MainActivity extends AppCompatActivity {
         imei = telephonyManager.getDeviceId();
         final String str = "Imei number: " + imei;
         imeiTextView.setText(str);
-        new sqlite3();
+
     }
 }

@@ -6,16 +6,19 @@ package com.bykth.confdroid.confdroid_application.model;
 public class XML_Setting
 {
     private String xmlLocation;
-    private String xmlQuery;
+    private String xmlRegexp;
+    private String toReplaceWith;
 
     /**
      * @param xmlLocation The location of the xml setting.
-     * @param xmlQuery Query of the xml.
+     * @param xmlRegexp Regexp to search for and replace.
+     * @param toReplaceWith the string to replace the matched string with.
      */
-    public XML_Setting(String xmlLocation, String xmlQuery)
+    public XML_Setting(String xmlLocation, String xmlRegexp, String toReplaceWith)
     {
         this.xmlLocation = xmlLocation;
-        this.xmlQuery = xmlQuery;
+        this.xmlRegexp = xmlRegexp;
+        this.toReplaceWith = toReplaceWith;
     }
 
     /**
@@ -28,7 +31,11 @@ public class XML_Setting
     /**
      * @return String
      */
-    public String getXmlQuery() {
-        return xmlQuery;
+    public String getXmlRegexp() {
+        return xmlRegexp;
+    }
+
+    public String getToReplaceWith() {
+        return toReplaceWith;
     }
 }
