@@ -1,5 +1,7 @@
 package com.bykth.confdroid.confdroid_application;
 
+import android.content.Context;
+import android.os.Environment;
 import com.bykth.confdroid.confdroid_application.model.Device;
 import com.bykth.confdroid.confdroid_application.model.User;
 import org.json.JSONException;
@@ -14,8 +16,10 @@ import java.net.URL;
  */
 public class ServerConnection {
     private JSONObject retrievedUpdates;
+    private Context context ;
 
-    public ServerConnection() {
+    public ServerConnection(Context context) {
+        this.context = context;
 
     }
 
@@ -24,7 +28,7 @@ public class ServerConnection {
      * Fetches a json string from the server.
      *
      * @param request a slash notetated request string  (Ex. /user/device)
-     * @param data    variables to be sent with te request, starting with a &. (Ex.&imei=1234&user=2)
+     * @param data    variables to be sent with te request, starting with a ?. (Ex.?imei=1234&user=2)
      * @return JSONObject
      */
     private JSONObject fetch(final String request, final String data) {
@@ -34,12 +38,13 @@ public class ServerConnection {
                 String result = "";
                 BufferedReader reader = null;
                 try {
-                    URL url = new URL("https://confdroid.tutus.se/api" + request + ".json?userAuth=testToken" + data);
+                    URL url = new URL("https://confdroid.tutus.se/api" + request + ".json" + data);
                     HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                     InputStream in = new BufferedInputStream(connection.getInputStream());
                     reader = new BufferedReader(new InputStreamReader(in));
                     result = reader.readLine();
                     retrievedUpdates = new JSONObject(result);
+                    writeJSONtoTXT(result);
 
                 } catch (Exception e) {
                     System.out.println("URL request failed with: " + e.getMessage());
@@ -70,7 +75,7 @@ public class ServerConnection {
      * @throws JSONException
      */
     public User fetchUser() throws JSONException {
-        JSONObject userJson = fetch("/user", "");
+        JSONObject userJson = fetch("/user/testToken", "");
         User user = new User(userJson.getString("name"), userJson.getString("email"));
         return user;
     }
@@ -82,7 +87,7 @@ public class ServerConnection {
      * @throws JSONException
      */
     public User fetchUser(String imei) throws JSONException {
-        JSONObject userJson = fetch("/user", "&imei=" + imei);
+        JSONObject userJson = fetch("/user/testToken", "&imei=" + imei);
         User user = new User(userJson.getString("name"), userJson.getString("email"), userJson.getJSONArray("devices"));
         if (userJson.getJSONArray("devices").length() > 0) {
             user.addDevice(new Device(userJson.getJSONArray("devices").getJSONObject(0).getString("name"), userJson.getJSONArray("devices").getJSONObject(0).getString("imei"), userJson.getJSONArray("devices").getJSONObject(0).getJSONArray("applications")));
@@ -90,6 +95,16 @@ public class ServerConnection {
             System.out.println("This IMEI doesn't exists!");
         }
         return user;
+    }
+    private void writeJSONtoTXT(String Json) {
+        FileOutputStream stream = null;
+        try {
+            stream = new FileOutputStream(context.getFilesDir() + "/json.txt");
+            stream.write(Json.getBytes());
+            stream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

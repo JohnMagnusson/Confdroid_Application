@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected User doInBackground(String... imeis) {
 
-            final ServerConnection serverCon = new ServerConnection();
+            final ServerConnection serverCon = new ServerConnection(getBaseContext());
             try {
                 User user = serverCon.fetchUser(imei);
                 if (user != null) {

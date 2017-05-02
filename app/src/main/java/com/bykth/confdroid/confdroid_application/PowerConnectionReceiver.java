@@ -21,7 +21,7 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
 
         Toast.makeText(context, "Charging: " + isCharging, Toast.LENGTH_LONG).show();
         if (isCharging) {
-            final ServerConnection serverCon = new ServerConnection();
+            final ServerConnection serverCon = new ServerConnection(context);
             try {
                 TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
                 User user = serverCon.fetchUser(telephonyManager.getDeviceId());
