@@ -63,12 +63,24 @@ public class ServerConnection {
         return retrievedUpdates;
     }
 
+    /**
+     * Fetch a user with all its devices.
+     *
+     * @return
+     * @throws JSONException
+     */
     public User fetchUser() throws JSONException {
         JSONObject userJson = fetch("/user", "");
         User user = new User(userJson.getString("name"), userJson.getString("email"));
         return user;
     }
 
+    /**
+     * Fetch a user with only the device with the supplied imei.
+     * @param imei
+     * @return
+     * @throws JSONException
+     */
     public User fetchUser(String imei) throws JSONException {
         JSONObject userJson = fetch("/user", "&imei=" + imei);
         User user = new User(userJson.getString("name"), userJson.getString("email"), userJson.getJSONArray("devices"));
