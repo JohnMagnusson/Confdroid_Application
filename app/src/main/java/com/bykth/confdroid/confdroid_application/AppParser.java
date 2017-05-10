@@ -1,18 +1,24 @@
 package com.bykth.confdroid.confdroid_application;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.util.Log;
 import com.bykth.confdroid.confdroid_application.model.Application;
 import com.bykth.confdroid.confdroid_application.model.SQL_Setting;
 import com.bykth.confdroid.confdroid_application.model.XML_Setting;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 /**
  * AppParser handles the incoming data and parse it and send it to the application where it is stored.
  */
-public class AppParser
-{
+public class AppParser {
     private ArrayList<Application> applications = new ArrayList<>();
     private Context context;
 
@@ -38,6 +44,7 @@ public class AppParser
             public void run() {
                 for (Application app : applications) {
                     if (!app.getSqlSettings().isEmpty()) {
+
                         System.out.println("SQL settings avalible for " + app.getFriendlyName() + ", starting run.");
                         SQLHandler sqlite3 = new SQLHandler();
                         for (SQL_Setting sqlSetting : app.getSqlSettings()) {
@@ -67,8 +74,14 @@ public class AppParser
         try {
             //Waits here until serverThread is done
             parseThread.join();
+            Filehandler fh = new Filehandler(context);
+            fh.writeJSONtoTXT(fh.readFileAsString(), true);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
+
+
+
+
 }

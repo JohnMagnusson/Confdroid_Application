@@ -6,25 +6,25 @@ import java.util.ArrayList;
  * This class stores data of an app.
  * Settings, if it should be force installed, data directory, apk name and apk url.
  */
-public class Application
-{
+public class Application {
     private ArrayList<SQL_Setting> sql_settings;
     private ArrayList<XML_Setting> xml_settings;
     private boolean force_install;
     private String dataDir;
     private String apkName;
     private String apkUrl;
+    private String packageName;
     private String friendlyName;
 
     /**
      * This class stores data of an app.
+     *
      * @param force_install If th app should be force installed.
-     * @param dataDir Where the app is stored.
-     * @param apkName Name of the apk.
-     * @param apkUrl Url to the apk.
+     * @param dataDir       Where the app is stored.
+     * @param apkName       Name of the apk.
+     * @param apkUrl        Url to the apk.
      */
-    public Application(String friendlyName, boolean force_install, String dataDir, String apkName, String apkUrl)
-    {
+    public Application(String friendlyName, boolean force_install, String dataDir, String apkName, String apkUrl, String packageName) {
         this.friendlyName = friendlyName;
         this.sql_settings = new ArrayList();
         this.xml_settings = new ArrayList();
@@ -32,6 +32,7 @@ public class Application
         this.dataDir = dataDir;
         this.apkName = apkName;
         this.apkUrl = apkUrl;
+        this.packageName = packageName;
     }
 
     /**
@@ -40,6 +41,7 @@ public class Application
     public ArrayList<SQL_Setting> getSqlSettings() {
         return (ArrayList<SQL_Setting>) sql_settings.clone();
     }
+
     /**
      * @return XML_Setting
      */
@@ -54,29 +56,37 @@ public class Application
     public void addXmlSetting(XML_Setting xmlSetting) {
         this.xml_settings.add(xmlSetting);
     }
+
     /**
      * @return boolean
      */
     public boolean isForce_install() {
         return force_install;
     }
+
     /**
      * @return String
      */
     public String getDataDir() {
         return dataDir;
     }
+
     /**
      * @return String
      */
     public String getApkName() {
         return apkName;
     }
+
     /**
      * @return String
      */
     public String getApkUrl() {
         return apkUrl;
+    }
+
+    public String getPackageName() {
+        return packageName;
     }
 
     public String getFriendlyName() {

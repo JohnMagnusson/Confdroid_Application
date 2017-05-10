@@ -9,15 +9,13 @@ import java.util.ArrayList;
 /**
  * User have a name and email.
  */
-public class User
-{
+public class User {
     private String name;
     private String email;
     private ArrayList<Device> devices;
     private ArrayList<Group> groups;
 
-    public User(String name, String email)
-    {
+    public User(String name, String email) {
         this.name = name;
         this.email = email;
         this.devices = new ArrayList<>();
@@ -35,24 +33,20 @@ public class User
         }
     }
 
-    public void addDevice(Device device)
-    {
-        if(device != null)
+    public void addDevice(Device device) {
+        if (device != null)
             devices.add(device);
     }
 
-    public void setEmail(String email)
-    {
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public String getEmail()
-    {
+    public String getEmail() {
         return email;
     }
 
