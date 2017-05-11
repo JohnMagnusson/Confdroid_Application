@@ -13,7 +13,11 @@ import java.util.ArrayList;
  */
 public class downloadWrapper {
 
-
+    /**
+     * Wrapperclassed to download and install new updates
+     * Used mainly by the notification
+     * @param context
+     */
     public void install(Context context) {
         final ServerConnection serverCon = new ServerConnection(context);
         try {

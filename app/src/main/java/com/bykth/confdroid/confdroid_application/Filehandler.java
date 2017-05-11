@@ -16,6 +16,13 @@ public class Filehandler {
 
     }
 
+    /**
+     * writes a file and takes in 2 boolean if it is supose to be hashed and if the install did succes as it is used by
+     * many diffrent methods in the system
+     * @param Json
+     * @param toBeHashed
+     * @param installSucces
+     */
     public void writeJSONtoTXT(String Json, Boolean toBeHashed,Boolean installSucces) {
         FileOutputStream stream = null;
         String filepathway;
@@ -38,6 +45,11 @@ public class Filehandler {
         }
     }
 
+    /**
+     * hash string to MD5
+     * @param md5
+     * @return
+     */
     private String MD5(String md5) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
@@ -52,6 +64,10 @@ public class Filehandler {
         return null;
     }
 
+    /**
+     * reads a txt file of the latest json recived from server
+     * @return
+     */
     public String readLatestRecivedFileAsString() {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = null;
@@ -71,6 +87,11 @@ public class Filehandler {
         }
         return fileData.toString();
     }
+
+    /**
+     * Read a md5 hashed file
+     * @return
+     */
     public String readSuccessedSettingsAsString() {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = null;
@@ -91,6 +112,11 @@ public class Filehandler {
         return fileData.toString();
     }
 
+    /**
+     * write a Authentication object to binaryFile
+     * @param URL
+     * @param Auth
+     */
     public void WriteConfigurationFileToBinary(String URL,String Auth)  {
         Authentication auth = new Authentication(URL,Auth);
         FileOutputStream outFile;
@@ -110,6 +136,10 @@ public class Filehandler {
         } // catch
     }
 
+    /**
+     * reads a BinaryFile containing Authentication object with URL and Authtoken
+     * @return
+     */
     public Authentication readFromConfigurationFileBinary() {
         Authentication auth = null;
         try {
