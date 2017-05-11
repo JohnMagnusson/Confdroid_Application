@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 import com.bykth.confdroid.confdroid_application.model.Authentication;
 import com.bykth.confdroid.confdroid_application.model.Device;
 import com.bykth.confdroid.confdroid_application.model.User;
@@ -53,7 +54,7 @@ public class ServerConnection {
 
                 BufferedReader reader = null;
                 try {
-                    AppRunning(context);
+
                     auth = fh.readFromConfigurationFileBinary();
                     URL url = new URL(auth.getUrlToServer()+"/api/user/"+auth.getAuthenticateToken() + ".json" + data);
                     System.out.println(url);
@@ -65,7 +66,7 @@ public class ServerConnection {
                     result = reader.readLine();
 
                     if (retrivedcode == 200) {
-                        fh.writeJSONtoTXT(result, false);
+                        fh.writeJSONtoTXT(result, false,false);
                         retrievedUpdates = new JSONObject(result);
                     }
                 } catch (Exception e) {
@@ -113,8 +114,9 @@ public class ServerConnection {
      * @throws JSONException
      */
     public User fetchUser(String imei) throws JSONException, Exception {
+
         Filehandler fh = new Filehandler(context);
-        JSONObject userJson = fetch( "?imei=" + imei + "&hash=" + fh.readFileAsString());
+        JSONObject userJson = fetch( "?imei=" + imei + "&hash=" + fh.readSuccessedSettingsAsString());
         if (userJson == null) {
             throw new Exception("" + this.retrivedcode);
         }
@@ -124,6 +126,7 @@ public class ServerConnection {
         } else {
             System.out.println("This IMEI doesn't exists!");
         }
+
         return user;
     }
 
@@ -139,18 +142,7 @@ public class ServerConnection {
         KeyManager[] keyManagers = kmf.getKeyManagers();
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(keyManagers, null, null);
-
-
     }
 
-    public void AppRunning(Context ctx) {
-        ActivityManager actvityManager = (ActivityManager)
-                ctx.getSystemService( ACTIVITY_SERVICE );
-        List<ActivityManager.RunningAppProcessInfo> procInfos = actvityManager.getRunningAppProcesses();
 
-        for(ActivityManager.RunningAppProcessInfo runningProInfo:procInfos){
-
-            Log.d("Running Processes", "()()"+runningProInfo.processName);
-        }
-    }
 }

@@ -1,6 +1,7 @@
 package com.bykth.confdroid.confdroid_application;
 
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,6 +25,7 @@ import com.bykth.confdroid.confdroid_application.model.User;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -47,6 +49,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Filehandler fh = new Filehandler(this);
+
+
+        ActivityManager activityManager = (ActivityManager) this.getSystemService( ACTIVITY_SERVICE );
+        List<ActivityManager.RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
+
+        for(ActivityManager.RunningAppProcessInfo app : procInfos){
+            System.out.println(app.processName);
+        }
+
         if (fh.readFromConfigurationFileBinary() == null) {
             createLoginview();
         }else{

@@ -18,8 +18,14 @@ public class downloadWrapper {
         final ServerConnection serverCon = new ServerConnection(context);
         try {
             TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            User user = serverCon.fetchUser(telephonyManager.getDeviceId());
+            String imei = telephonyManager.getDeviceId();
+
+            User user = serverCon.fetchUser(imei);
+            System.out.println(user.getName());
+            System.out.println(user.getDevices().get(0).getName());
             if (user != null) {
+
+
                 if (!user.getDevices().isEmpty()) {
                     ArrayList<Application> apps = user.getDevices().get(0).getApplications();
                     for (Application app : apps) {

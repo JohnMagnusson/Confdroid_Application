@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 import com.bykth.confdroid.confdroid_application.model.Application;
 import com.bykth.confdroid.confdroid_application.model.SQL_Setting;
 import com.bykth.confdroid.confdroid_application.model.XML_Setting;
@@ -42,6 +43,7 @@ public class AppParser {
         Thread parseThread = new Thread(new Runnable() {
             @Override
             public void run() {
+
                 for (Application app : applications) {
                     if (!app.getSqlSettings().isEmpty()) {
 
@@ -75,7 +77,7 @@ public class AppParser {
             //Waits here until serverThread is done
             parseThread.join();
             Filehandler fh = new Filehandler(context);
-            fh.writeJSONtoTXT(fh.readFileAsString(), true);
+            fh.writeJSONtoTXT(fh.readLatestRecivedFileAsString(), true,true);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

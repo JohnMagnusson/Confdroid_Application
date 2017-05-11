@@ -16,10 +16,17 @@ public class Filehandler {
 
     }
 
-    public void writeJSONtoTXT(String Json, Boolean toBeHashed) {
+    public void writeJSONtoTXT(String Json, Boolean toBeHashed,Boolean installSucces) {
         FileOutputStream stream = null;
+        String filepathway;
+        if(installSucces){
+            filepathway="/latestsettings.txt";
+        }else {
+            filepathway ="/latestrecived.txt";
+        }
+
         try {
-            stream = new FileOutputStream(this.context.getFilesDir() + "/json.txt");
+            stream = new FileOutputStream(this.context.getFilesDir() + filepathway);
             if (toBeHashed) {
                 stream.write(MD5(Json).getBytes());
             } else {
@@ -45,12 +52,31 @@ public class Filehandler {
         return null;
     }
 
-    public String readFileAsString() {
+    public String readLatestRecivedFileAsString() {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(
-                    new FileReader(this.context.getFilesDir() + "/json.txt"));
+                    new FileReader(this.context.getFilesDir()  + "/latestrecived.txt"));
+            char[] buf = new char[1024];
+            int numRead = 0;
+
+            while ((numRead = reader.read(buf)) != -1) {
+                String readData = String.valueOf(buf, 0, numRead);
+                fileData.append(readData);
+            }
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return fileData.toString();
+    }
+    public String readSuccessedSettingsAsString() {
+        StringBuffer fileData = new StringBuffer();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new FileReader(this.context.getFilesDir()  + "/latestsettings.txt"));
             char[] buf = new char[1024];
             int numRead = 0;
 
