@@ -17,8 +17,8 @@ public class Filehandler {
     }
 
     /**
-     * writes a file and takes in 2 boolean if it is supose to be hashed and if the install did succes as it is used by
-     * many diffrent methods in the system
+     * writes a file and takes in 2 boolean if it is suppose to be hashed and if the install did success as it is used by
+     * many different methods in the system
      * @param Json
      * @param toBeHashed
      * @param installSucces

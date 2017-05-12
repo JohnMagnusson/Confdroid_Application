@@ -27,6 +27,13 @@ public class NotificationActivity extends Activity {
         finish(); // since finish() is called in onCreate(), onDestroy() will be called immediately
     }
 
+    /**
+     * Terminates the notification if pressed
+     *
+     * @param notificationId
+     * @param context
+     * @return
+     */
     private static PendingIntent getDismissIntent(int notificationId, Context context) {
         Intent intent = new Intent(context, NotificationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -35,6 +42,13 @@ public class NotificationActivity extends Activity {
         return dismissIntent;
     }
 
+    /**
+     * create the custom notification that triggers a action to download new settings
+     *
+     * @param notificationId
+     * @param context
+     * @return
+     */
     private static PendingIntent getDownloadIntent(int notificationId, Context context) {
         Intent intent = new Intent(context, ActionReceiver.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -44,13 +58,18 @@ public class NotificationActivity extends Activity {
         return downloadIntent;
     }
 
+    /**
+     * Creates the notification
+     *
+     * @param context
+     */
     public void showNotification(Context context) {
 
         int notificationId = new Random().nextInt(); // just use a counter in some util class...
         PendingIntent dismissIntent = NotificationActivity.getDismissIntent(notificationId, context);
         PendingIntent downloadIntent = NotificationActivity.getDownloadIntent(notificationId, context);
 
-
+        // Creates the design of the notification and the buttons that is inside of it and initiate it.
         NotificationCompat.Builder notification = new NotificationCompat.Builder(context)
                 .setSmallIcon(android.R.drawable.ic_menu_report_image)
                 .setVibrate(new long[]{250, 250, 300, 300, 250, 250})

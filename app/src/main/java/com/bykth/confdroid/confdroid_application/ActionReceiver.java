@@ -9,7 +9,11 @@ import android.content.Intent;
  * Created by Glantz on 2017-05-09.
  */
 public class ActionReceiver extends BroadcastReceiver {
-
+    /**
+     * A listner to listen if a install button is pressed.
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -26,6 +30,10 @@ public class ActionReceiver extends BroadcastReceiver {
         context.sendBroadcast(it);
     }
 
+    /**
+     * installs the latest downloaded settings after the notificationbutton install is pressed
+     * @param context
+     */
     private void performAction1(Context context) {
         downloadWrapper dw = new downloadWrapper();
         dw.install(context);

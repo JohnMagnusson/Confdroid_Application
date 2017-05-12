@@ -1,10 +1,6 @@
 package com.bykth.confdroid.confdroid_application;
 
-import android.app.ActivityManager;
 import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
-import android.widget.Toast;
 import com.bykth.confdroid.confdroid_application.model.Authentication;
 import com.bykth.confdroid.confdroid_application.model.Device;
 import com.bykth.confdroid.confdroid_application.model.User;
@@ -18,11 +14,6 @@ import javax.net.ssl.SSLContext;
 import java.io.*;
 import java.net.URL;
 import java.security.KeyStore;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-
-import static android.content.Context.ACTIVITY_SERVICE;
 
 /**
  * Connection between the application and the server is handled in this class.
@@ -39,12 +30,14 @@ public class ServerConnection {
 
 
     /**
-     * Fetches a json string from the server.
+     * Fetches a json string from the server, uses the config file to get the URL to connect to and in that same file
+     * the Authtoken is stored to verify the user.
+     * The config file is of binary type which contains a object that contains all necessary information to authenticate and log on to the server
      *
-     * @param data    variables to be sent with te request, starting with a ?. (Ex.?imei=1234&user=2)
+     * @param data variables to be sent with te request, starting with a ?. (Ex.?imei=1234&user=2)
      * @return JSONObject
      */
-    private JSONObject fetch( final String data) throws Exception {
+    private JSONObject fetch(final String data) throws Exception {
         Thread serverThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -54,9 +47,10 @@ public class ServerConnection {
 
                 BufferedReader reader = null;
                 try {
-
+                    // reads in the Binary file to a Authenticationobject
                     auth = fh.readFromConfigurationFileBinary();
-                    URL url = new URL(auth.getUrlToServer()+"/api/user/"+auth.getAuthenticateToken() + ".json" + data);
+                    // Creates the full URL used to fetch new updates
+                    URL url = new URL(auth.getUrlToServer() + "/api/user/" + auth.getAuthenticateToken() + ".json" + data);
                     System.out.println(url);
                     HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
                     retrivedcode = connection.getResponseCode();
@@ -65,8 +59,10 @@ public class ServerConnection {
                     reader = new BufferedReader(new InputStreamReader(in));
                     result = reader.readLine();
 
+                    // if no problems are received from the server a http 200 code is return as a success
+                    //else the latest JSON will not be stored localy and a null object will be returned instead
                     if (retrivedcode == 200) {
-                        fh.writeJSONtoTXT(result, false,false);
+                        fh.writeJSONtoTXT(result, false, false);
                         retrievedUpdates = new JSONObject(result);
                     }
                 } catch (Exception e) {
@@ -95,19 +91,19 @@ public class ServerConnection {
     }
 
     /**
-     * Fetch a user with all its devices.
+     * Useless method that is never used...
      *
      * @return
      * @throws JSONException
      */
     public User fetchUser() throws JSONException, Exception {
-        JSONObject userJson = fetch( "");
+        JSONObject userJson = fetch("");
         User user = new User(userJson.getString("name"), userJson.getString("email"));
         return user;
     }
 
     /**
-     * Fetch a user with only the device with the supplied imei.
+     * Fetch a user with only the device with the supplied imei, reads the lates successfully installed settings.
      *
      * @param imei
      * @return
@@ -116,7 +112,8 @@ public class ServerConnection {
     public User fetchUser(String imei) throws JSONException, Exception {
 
         Filehandler fh = new Filehandler(context);
-        JSONObject userJson = fetch( "?imei=" + imei + "&hash=" + fh.readSuccessedSettingsAsString());
+        JSONObject userJson = fetch("?imei=" + imei + "&hash=" + fh.readSuccessedSettingsAsString());
+        // This checks if the connection was successfully ells the HTTP responsecode is thrown in a Exception
         if (userJson == null) {
             throw new Exception("" + this.retrivedcode);
         }
@@ -130,6 +127,11 @@ public class ServerConnection {
         return user;
     }
 
+    /**
+     * Not used at this moment
+     *
+     * @throws Exception
+     */
     private void loadkeystore() throws Exception {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         FileInputStream fis = new FileInputStream("");
