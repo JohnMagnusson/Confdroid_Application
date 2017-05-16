@@ -1,37 +1,28 @@
 package com.bykth.confdroid.confdroid_application;
 
 
-import android.app.ActivityManager;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.bykth.confdroid.confdroid_application.model.Application;
-import com.bykth.confdroid.confdroid_application.model.Authentication;
 import com.bykth.confdroid.confdroid_application.model.User;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 public class MainActivity extends AppCompatActivity {
 
 
     private String imei;
+    private String phoneName;
     private TextView imeiTextView;
     private TextView emailTextView;
     private TextView nameTextView;
@@ -44,28 +35,20 @@ public class MainActivity extends AppCompatActivity {
     private EditText authtoken;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setDeviceInfo();
         Filehandler fh = new Filehandler(this);
-
-
-        ActivityManager activityManager = (ActivityManager) this.getSystemService( ACTIVITY_SERVICE );
-        List<ActivityManager.RunningAppProcessInfo> procInfos = activityManager.getRunningAppProcesses();
-
-        for(ActivityManager.RunningAppProcessInfo app : procInfos){
-            System.out.println(app.processName);
-        }
-
         if (fh.readFromConfigurationFileBinary() == null) {
             createLoginview();
-        }else{
+        } else {
             createStandardView();
         }
 
     }
-    private void createLoginview(){
+
+    private void createLoginview() {
         final Filehandler fh = new Filehandler(this);
         setContentView(R.layout.setup_layout);
         Button submitButton = (Button) findViewById(R.id.Submittbutton);
@@ -74,12 +57,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 URL = (EditText) findViewById(R.id.addWebsiteURL);
                 authtoken = (EditText) findViewById(R.id.addAuthtoken);
-                fh.WriteConfigurationFileToBinary(URL.getText().toString(),authtoken.getText().toString());
+                System.out.println("IMEI:" + imei);
+                System.out.println("PhoneName:" + phoneName);
+                new firstSigning().execute(); // just connects to the server and sends its IMEI and Name
+                fh.WriteConfigurationFileToBinary(URL.getText().toString(), authtoken.getText().toString());
                 createStandardView();
             }
         });
     }
-    private void createStandardView(){
+
+    /**
+     * Creates the standard view where imei,device name is set as well as user name and email connected to the device
+     */
+    private void createStandardView() {
         setContentView(R.layout.activity_main);
         imeiTextView = (TextView) findViewById(R.id.imeiTextView);
         nameTextView = (TextView) findViewById(R.id.nameText);
@@ -88,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         statusTextView = (TextView) findViewById(R.id.statusText);
         fetchButton = (Button) findViewById(R.id.button);
         settingsButton = (Button) findViewById(R.id.settingsButton);
-        doWithPermissions();
+        postImeiOnScreen();
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,22 +91,37 @@ public class MainActivity extends AppCompatActivity {
                 createLoginview();
             }
         });
-
     }
 
     /**
-     * Creates a serverconnection and fetches an user which is then printed out on screen
+     * Creates a server connection and fetches an user which is then printed out on screen
      */
     private void printJsonFromServer() {
         new fetchUpdates().execute();
 
     }
 
-    private void doWithPermissions() {
-        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        imei = telephonyManager.getDeviceId();
+    private void postImeiOnScreen() {
         final String str = "Imei number: " + imei;
         imeiTextView.setText(str);
+
+    }
+
+    /**
+     *Sets the specific error code that is received from the web-server when trying to retrieve updates
+     */
+    private void setErrorCode(String errorcode) {
+        this.ErrorCode = errorcode;
+    }
+
+    /**
+     * Sets IMEI and friendly Name on the phone
+     */
+    private void setDeviceInfo() {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        imei = telephonyManager.getDeviceId();
+        BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+        phoneName = myDevice.getName();
 
     }
 
@@ -179,10 +184,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setErrorCode(String errorcode) {
-        this.ErrorCode = errorcode;
-    }
 
+    private class firstSigning extends AsyncTask<String, Integer, Void> {
+        @Override
+        protected Void doInBackground(String... imeis) {
+            final ServerConnection serverCon = new ServerConnection(getBaseContext());
+            try {
+                serverCon.firstConnectionForPhone(imei, phoneName, URL.getText().toString());
+            } catch (Exception e) {
+                setErrorCode(e.getMessage());
+            }
+
+            return null;
+        }
+    }
 }
 
 

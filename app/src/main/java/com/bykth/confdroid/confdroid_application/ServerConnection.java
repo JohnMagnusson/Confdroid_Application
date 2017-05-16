@@ -6,7 +6,6 @@ import com.bykth.confdroid.confdroid_application.model.Device;
 import com.bykth.confdroid.confdroid_application.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -30,11 +29,70 @@ public class ServerConnection {
 
 
     /**
+     * When the app is launched for the first time the app prompts a window to ask for URL to the server and a AUTH token.
+     * This method then takes the URL and through HTTPS connects to the server and then using a buffer stream reading in its
+     * IMEI number and Friendly Phone name
+     *
+     * @param imei
+     * @param phoneName
+     * @param URL
+     */
+
+    public void firstConnectionForPhone(final String imei, final String phoneName, final String URL) {
+
+        Thread serverThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(URL + "/api/device.json");
+                    System.out.println(url);
+                    HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+                    conn.setReadTimeout(10000);
+                    conn.setConnectTimeout(15000);
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                    /*
+                     *  Creates the JSON object that is the passed to the server and then created as a string
+                     */
+                    JSONObject root = new JSONObject();
+                    //
+                    root.put("imei", imei);
+                    root.put("name", phoneName);
+                    String str = root.toString();
+
+                    // ***************************
+                    OutputStream os = conn.getOutputStream();
+                    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                    writer.write(str);
+                    writer.flush();
+                    writer.close();
+                    os.close();
+
+                    // Possible to add a reader here to get information back to the phone, such as certificate etc.
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        serverThread.start();
+        try {
+            //Waits here until serverThread is done
+            serverThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /**
      * Fetches a json string from the server, uses the config file to get the URL to connect to and in that same file
      * the Authtoken is stored to verify the user.
      * The config file is of binary type which contains a object that contains all necessary information to authenticate and log on to the server
+     * <p>
+     * data varibles to be sent with te request, starting with a ?. (Ex.?imei=1234&user=2)
      *
-     * @param data variables to be sent with te request, starting with a ?. (Ex.?imei=1234&user=2)
      * @return JSONObject
      */
     private JSONObject fetch(final String data) throws Exception {
@@ -96,7 +154,7 @@ public class ServerConnection {
      * @return
      * @throws JSONException
      */
-    public User fetchUser() throws JSONException, Exception {
+    public User fetchUser() throws  Exception {
         JSONObject userJson = fetch("");
         User user = new User(userJson.getString("name"), userJson.getString("email"));
         return user;
@@ -109,7 +167,7 @@ public class ServerConnection {
      * @return
      * @throws JSONException
      */
-    public User fetchUser(String imei) throws JSONException, Exception {
+    public User fetchUser(String imei) throws  Exception {
 
         Filehandler fh = new Filehandler(context);
         JSONObject userJson = fetch("?imei=" + imei + "&hash=" + fh.readSuccessedSettingsAsString());

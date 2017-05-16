@@ -1,20 +1,14 @@
 package com.bykth.confdroid.confdroid_application;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.ComponentName;
+
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import com.bykth.confdroid.confdroid_application.model.Application;
 import com.bykth.confdroid.confdroid_application.model.SQL_Setting;
 import com.bykth.confdroid.confdroid_application.model.XML_Setting;
-
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
-
-import static android.content.Context.ACTIVITY_SERVICE;
 
 /**
  * AppParser handles the incoming data and parse it and send it to the application where it is stored.
@@ -22,6 +16,9 @@ import static android.content.Context.ACTIVITY_SERVICE;
 public class AppParser {
     private ArrayList<Application> applications = new ArrayList<>();
     private Context context;
+    private Boolean Processrunning;
+    private ArrayList<Application> terminatedApps;
+
 
     /**
      * Initilizes the class with the list of applications to be parsed, and the cantext of the main actvity
@@ -32,6 +29,7 @@ public class AppParser {
     public AppParser(ArrayList<Application> applications, Context context) {
         this.applications = applications;
         this.context = context;
+        terminatedApps = new ArrayList<>();
     }
 
 
@@ -40,11 +38,19 @@ public class AppParser {
      */
     public void parse() {
         final ArrayList<Application> applications = this.applications;
+
         Thread parseThread = new Thread(new Runnable() {
             @Override
             public void run() {
 
                 for (Application app : applications) {
+                    if(findprocess(app.getPackageName())!=null){
+                        Processrunning= true;
+                        if(Kill(app.getPackageName())&&Processrunning==true){
+                            terminatedApps.add(app);
+                            Processrunning = false;
+                        }
+                    }
                     if (!app.getSqlSettings().isEmpty()) {
 
                         System.out.println("SQL settings avalible for " + app.getFriendlyName() + ", starting run.");
@@ -77,13 +83,94 @@ public class AppParser {
             //Waits here until serverThread is done
             parseThread.join();
             Filehandler fh = new Filehandler(context);
-            fh.writeJSONtoTXT(fh.readLatestRecivedFileAsString(), true,true);
+            fh.writeJSONtoTXT(fh.readLatestReceivedFileAsString(), true, true);
+            for (Application app:terminatedApps) {
+                openApp(app.getPackageName());
+            }
+
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
+    private boolean Kill(String packagename) {
+        try {
+            Process proc = Runtime.getRuntime().exec("su");
+            DataOutputStream os = new DataOutputStream(proc.getOutputStream());
+            os.writeBytes("kill " + findprocess(packagename) + "\n");
+            os.writeBytes("exit\n");
+            os.flush();
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(proc.getInputStream()));
 
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(proc.getErrorStream()));
+
+            // wait for the output from the command
+            String s = null;
+            while ((s = stdInput.readLine()) != null) ;
+            // wait for any errors from the attempted command
+            while ((s = stdError.readLine()) != null) ;
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+
+    }
+
+    private String findprocess(String packagename) {
+
+
+        try {
+            // Executes the command.
+            Process process = Runtime.getRuntime().exec("pgrep -f " + packagename);
+
+
+            // Reads stdout.
+            // NOTE: You can write to stdin of the command using
+            //       process.getOutputStream().
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+            int read;
+            char[] buffer = new char[4096];
+            StringBuffer output = new StringBuffer();
+            while ((read = reader.read(buffer)) > 0) {
+                output.append(buffer, 0, read);
+            }
+            reader.close();
+            // Waits for the command to finish.
+            process.waitFor();
+
+            return output.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    public boolean openApp(String packageName) {
+        PackageManager manager = context.getPackageManager();
+        try {
+            Intent i = manager.getLaunchIntentForPackage(packageName);
+            if (i == null) {
+                return false;
+            }
+            i.addCategory(Intent.CATEGORY_LAUNCHER);
+            context.startActivity(i);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
 
 }
+
+
+
+
+

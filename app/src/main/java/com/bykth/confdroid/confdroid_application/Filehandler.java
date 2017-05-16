@@ -65,10 +65,10 @@ public class Filehandler {
     }
 
     /**
-     * reads a txt file of the latest json recived from server
+     * reads a txt file of the latest json received from server
      * @return
      */
-    public String readLatestRecivedFileAsString() {
+    public String readLatestReceivedFileAsString() {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = null;
         try {
@@ -137,7 +137,7 @@ public class Filehandler {
     }
 
     /**
-     * reads a BinaryFile containing Authentication object with URL and Authtoken
+     * reads a BinaryFile containing Authentication object with URL and Auth token
      * @return
      */
     public Authentication readFromConfigurationFileBinary() {
