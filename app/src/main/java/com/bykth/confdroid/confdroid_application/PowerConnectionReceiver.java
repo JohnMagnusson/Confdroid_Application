@@ -15,7 +15,7 @@ public class PowerConnectionReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         NotificationActivity Na = new NotificationActivity();
         boolean isCharging = false;
-        if (intent.getAction() == Intent.ACTION_POWER_CONNECTED) isCharging = true;
+        if (intent.getAction().equals(Intent.ACTION_POWER_CONNECTED)) isCharging = true;
         if (isCharging) {
             final ServerConnection serverCon = new ServerConnection(context);
             try {
