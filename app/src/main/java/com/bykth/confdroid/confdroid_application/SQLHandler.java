@@ -11,13 +11,13 @@ import java.net.URLConnection;
 /**
  * Created by Mattias Kågström on 2017-04-10.
  */
-public class SQLHandler {
+class SQLHandler {
 
     /**
      * Initilizies the sql handler, and cheks if sqlite3 is installed. if not, it will install it on the system.
      * REQUIRES ROOT!!!
      */
-    public SQLHandler() {
+    SQLHandler() {
         File varTmpDir = new File("/system/bin/sqlite3");
         boolean exists = varTmpDir.exists();
         if (exists) {
@@ -36,7 +36,7 @@ public class SQLHandler {
      * @param SQLQuerry The query to run on the file.
      * @throws IOException
      */
-    public void runQuery(String DBFile, String SQLQuerry) throws IOException {
+    void runQuery(String DBFile, String SQLQuerry) throws IOException {
         try {
             SQLQuerry = SQLQuerry.replaceAll("\"", "\\\"");
             Process proc = Runtime.getRuntime().exec("su");
@@ -51,8 +51,8 @@ public class SQLHandler {
                     InputStreamReader(proc.getErrorStream()));
 
 
-            String s = null;
-            while ((s = stdInput.readLine()) != null) ;
+            String s;
+            while (stdInput.readLine() != null) ;
 
 
             while ((s = stdError.readLine()) != null) {
@@ -64,7 +64,7 @@ public class SQLHandler {
         }
     }
 
-    protected void runInstallation() {
+    void runInstallation() {
         System.out.println("Running installation");
         Process p;
         try {
@@ -106,7 +106,7 @@ class DownloadFileFromURL extends AsyncTask<String, String, String> {
 
     private SQLHandler caller;
 
-    public DownloadFileFromURL(SQLHandler caller) {
+    DownloadFileFromURL(SQLHandler caller) {
         this.caller = caller;
     }
 

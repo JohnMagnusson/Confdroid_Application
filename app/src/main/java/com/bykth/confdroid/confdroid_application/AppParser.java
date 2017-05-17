@@ -26,7 +26,7 @@ public class AppParser {
      * @param applications
      * @param context
      */
-    public AppParser(ArrayList<Application> applications, Context context) {
+    AppParser(ArrayList<Application> applications, Context context) {
         this.applications = applications;
         this.context = context;
         terminatedApps = new ArrayList<>();
@@ -36,7 +36,7 @@ public class AppParser {
     /**
      * Parses all the apps supplied in the constructor and applies their settings.
      */
-    public void parse() {
+    void parse() {
         final ArrayList<Application> applications = this.applications;
 
         Thread parseThread = new Thread(new Runnable() {
@@ -46,7 +46,7 @@ public class AppParser {
                 for (Application app : applications) {
                     if(findprocess(app.getPackageName())!=null){
                         Processrunning= true;
-                        if(Kill(app.getPackageName())&&Processrunning==true){
+                        if(Kill(app.getPackageName())&& Processrunning){
                             terminatedApps.add(app);
                             Processrunning = false;
                         }
@@ -145,25 +145,21 @@ public class AppParser {
             process.waitFor();
 
             return output.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
 
     }
-    public boolean openApp(String packageName) {
+    private void openApp(String packageName) {
         PackageManager manager = context.getPackageManager();
         try {
             Intent i = manager.getLaunchIntentForPackage(packageName);
             if (i == null) {
-                return false;
+                return;
             }
             i.addCategory(Intent.CATEGORY_LAUNCHER);
             context.startActivity(i);
-            return true;
         } catch (Exception e) {
-            return false;
         }
     }
 

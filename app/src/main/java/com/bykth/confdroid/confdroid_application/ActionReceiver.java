@@ -39,7 +39,7 @@ public class ActionReceiver extends BroadcastReceiver {
         dw.install(context);
     }
 
-    public void performAction2() {
+    private void performAction2() {
     }
 
 }

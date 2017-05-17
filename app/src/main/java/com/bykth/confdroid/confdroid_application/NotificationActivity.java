@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class NotificationActivity extends Activity {
 
-    public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
+    private static final String NOTIFICATION_ID = "NOTIFICATION_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +38,7 @@ public class NotificationActivity extends Activity {
         Intent intent = new Intent(context, NotificationActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra(NOTIFICATION_ID, notificationId);
-        PendingIntent dismissIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        return dismissIntent;
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     /**
@@ -54,8 +53,7 @@ public class NotificationActivity extends Activity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.putExtra("action", "action1");
         intent.putExtra(NOTIFICATION_ID, notificationId);
-        PendingIntent downloadIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        return downloadIntent;
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     /**
@@ -63,7 +61,7 @@ public class NotificationActivity extends Activity {
      *
      * @param context
      */
-    public void showNotification(Context context) {
+    void showNotification(Context context) {
 
         int notificationId = new Random().nextInt(); // just use a counter in some util class...
         PendingIntent dismissIntent = NotificationActivity.getDismissIntent(notificationId, context);

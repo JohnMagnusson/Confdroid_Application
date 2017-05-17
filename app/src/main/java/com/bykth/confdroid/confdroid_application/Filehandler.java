@@ -23,7 +23,7 @@ public class Filehandler {
      * @param toBeHashed
      * @param installSucces
      */
-    public void writeJSONtoTXT(String Json, Boolean toBeHashed,Boolean installSucces) {
+    void writeJSONtoTXT(String Json, Boolean toBeHashed, Boolean installSucces) {
         FileOutputStream stream = null;
         String filepathway;
         if(installSucces){
@@ -55,8 +55,8 @@ public class Filehandler {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            for (byte anArray : array) {
+                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
@@ -68,7 +68,7 @@ public class Filehandler {
      * reads a txt file of the latest json received from server
      * @return
      */
-    public String readLatestReceivedFileAsString() {
+    String readLatestReceivedFileAsString() {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = null;
         try {
@@ -92,14 +92,14 @@ public class Filehandler {
      * Read a md5 hashed file
      * @return
      */
-    public String readSuccessedSettingsAsString() {
+    String readSuccessedSettingsAsString() {
         StringBuffer fileData = new StringBuffer();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(
                     new FileReader(this.context.getFilesDir()  + "/latestsettings.txt"));
             char[] buf = new char[1024];
-            int numRead = 0;
+            int numRead;
 
             while ((numRead = reader.read(buf)) != -1) {
                 String readData = String.valueOf(buf, 0, numRead);
@@ -117,7 +117,7 @@ public class Filehandler {
      * @param URL
      * @param Auth
      */
-    public void WriteConfigurationFileToBinary(String URL,String Auth)  {
+    void WriteConfigurationFileToBinary(String URL, String Auth)  {
         Authentication auth = new Authentication(URL,Auth);
         FileOutputStream outFile;
         ObjectOutputStream outStream;
@@ -138,9 +138,9 @@ public class Filehandler {
 
     /**
      * reads a BinaryFile containing Authentication object with URL and Auth token
-     * @return
+     * @return auth
      */
-    public Authentication readFromConfigurationFileBinary() {
+    Authentication readFromConfigurationFileBinary() {
         Authentication auth = null;
         try {
             FileInputStream fstream = new FileInputStream(this.context.getFilesDir() + "/auth.bin");

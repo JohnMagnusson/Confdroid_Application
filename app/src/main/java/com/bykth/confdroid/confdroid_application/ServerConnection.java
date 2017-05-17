@@ -7,12 +7,8 @@ import com.bykth.confdroid.confdroid_application.model.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
 import java.io.*;
 import java.net.URL;
-import java.security.KeyStore;
 
 /**
  * Connection between the application and the server is handled in this class.
@@ -22,7 +18,7 @@ public class ServerConnection {
     private int retrivedcode;
     private Context context;
 
-    public ServerConnection(Context context) {
+    ServerConnection(Context context) {
         this.context = context;
 
     }
@@ -38,7 +34,7 @@ public class ServerConnection {
      * @param URL
      */
 
-    public void firstConnectionForPhone(final String imei, final String phoneName, final String URL) {
+    void firstConnectionForPhone(final String imei, final String phoneName, final String URL) {
 
         Thread serverThread = new Thread(new Runnable() {
             @Override
@@ -99,7 +95,7 @@ public class ServerConnection {
         Thread serverThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                String result = "";
+                String result;
                 Filehandler fh = new Filehandler(context);
                 Authentication auth;
 
@@ -148,17 +144,6 @@ public class ServerConnection {
         return retrievedUpdates;
     }
 
-    /**
-     * Useless method that is never used...
-     *
-     * @return
-     * @throws JSONException
-     */
-    public User fetchUser() throws  Exception {
-        JSONObject userJson = fetch("");
-        User user = new User(userJson.getString("name"), userJson.getString("email"));
-        return user;
-    }
 
     /**
      * Fetch a user with only the device with the supplied imei, reads the lates successfully installed settings.
@@ -167,7 +152,7 @@ public class ServerConnection {
      * @return
      * @throws JSONException
      */
-    public User fetchUser(String imei) throws  Exception {
+    User fetchUser(String imei) throws  Exception {
 
         Filehandler fh = new Filehandler(context);
         JSONObject userJson = fetch("?imei=" + imei + "&hash=" + fh.readSuccessedSettingsAsString());
@@ -185,24 +170,8 @@ public class ServerConnection {
         return user;
     }
 
-    /**
-     * Not used at this moment
-     *
-     * @throws Exception
-     */
-    private void loadkeystore() throws Exception {
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        FileInputStream fis = new FileInputStream("");
-        // client cert password
-        keyStore.load(fis, "".toCharArray());
 
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance("X509");
-        // clientCert password
-        kmf.init(keyStore, "".toCharArray());
-        KeyManager[] keyManagers = kmf.getKeyManagers();
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(keyManagers, null, null);
-    }
+
 
 
 }
