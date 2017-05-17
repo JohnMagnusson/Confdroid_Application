@@ -26,6 +26,11 @@
                 android:excludeFromRecents="true">
         </activity>
         <receiver android:name=".ActionReceiver"></receiver>
+        <receiver android:name=".WifiConnectionReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
         <activity android:name=".MainActivity"
                   android:screenOrientation="portrait">
             <intent-filter>
