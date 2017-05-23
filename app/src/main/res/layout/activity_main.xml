@@ -13,29 +13,45 @@
 
     <TextView
             android:text="IMEI number: "
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" android:layout_marginStart="88dp" android:layout_marginTop="131dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:id="@+id/imeiTextView"
-    />
+            android:layout_alignParentTop="true" android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"/>
     <Button
             android:text="Fetch updates"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="66dp"
-            android:id="@+id/button" android:layout_alignTop="@+id/imeiTextView" android:layout_alignParentStart="true"
-            android:layout_marginStart="57dp"/>
+            android:id="@+id/button"
+            android:layout_marginTop="73dp"
+            android:layout_below="@+id/deviceText" android:layout_centerHorizontal="true"/>
     <TextView
-            android:text="Email:"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:layout_below="@+id/nameText"
-            android:layout_alignParentStart="true" android:layout_marginStart="34dp" android:layout_marginTop="44dp"
-            android:id="@+id/emailText" tools:text="Email:"/>
-    <TextView
-            android:text="Name:"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="47dp"
-            android:id="@+id/nameText" tools:text="Name:" android:layout_below="@+id/button"
-            android:layout_alignEnd="@+id/emailText"/>
+            android:layout_marginTop="12dp" android:id="@+id/deviceText"
+            android:layout_below="@+id/emailText" android:layout_alignParentStart="true"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="13dp"
+            android:id="@+id/emailText"
+            android:layout_below="@+id/nameText" android:layout_alignParentStart="true"/>
+    <TextView
+            android:text="Status:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/statusText" android:layout_below="@+id/imeiTextView"
+            android:layout_marginTop="11dp"/>
+    <TextView
+            android:layout_height="wrap_content"
+            android:layout_marginTop="9dp"
+            android:id="@+id/nameText"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/statusText" android:layout_alignParentStart="true"/>
+    <Button
+            android:text="Settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" android:layout_marginBottom="22dp" android:id="@+id/settingsButton"/>
 </RelativeLayout>

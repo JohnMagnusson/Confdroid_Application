@@ -1,128 +1,203 @@
 package com.bykth.confdroid.confdroid_application;
 
-import android.Manifest;
+
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
+import com.bykth.confdroid.confdroid_application.model.Application;
+import com.bykth.confdroid.confdroid_application.model.User;
 
-public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
+import java.text.DateFormat;
+import java.util.*;
 
-    final private int REQUEST_CODE_READ_PHONE_STATE = 1;
+
+public class MainActivity extends AppCompatActivity {
+
+
+    private String imei;
+    private String phoneName;
     private TextView imeiTextView;
-    private TextView nameTextView;
     private TextView emailTextView;
+    private TextView nameTextView;
+    private TextView deviceTextView;
+    private TextView statusTextView;
+    private Button fetchButton;
+    private Button settingsButton;
+    private String ErrorCode = "";
+    private EditText URL;
+    private EditText authtoken;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        System.out.println("Hello");
-        setContentView(R.layout.activity_main);
+        setDeviceInfo();
+        Filehandler fh = new Filehandler(this);
+        if (fh.readFromConfigurationFileBinary() == null) {
+            createLoginview();
+        } else {
+            createStandardView();
+        }
+
     }
 
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
+    private void createLoginview() {
+        final Filehandler fh = new Filehandler(this);
+        setContentView(R.layout.setup_layout);
+        Button submitButton = (Button) findViewById(R.id.Submittbutton);
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                URL = (EditText) findViewById(R.id.addWebsiteURL);
+                authtoken = (EditText) findViewById(R.id.addAuthtoken);
+                System.out.println("IMEI:" + imei);
+                System.out.println("PhoneName:" + phoneName);
+                new firstSigning().execute(); // just connects to the server and sends its IMEI and Name
+                fh.WriteConfigurationFileToBinary(URL.getText().toString(), authtoken.getText().toString());
+                createStandardView();
+            }
+        });
+    }
+
+    /**
+     * Creates the standard view where imei,device name is set as well as user name and email connected to the device
+     */
+    private void createStandardView() {
+        setContentView(R.layout.activity_main);
         imeiTextView = (TextView) findViewById(R.id.imeiTextView);
         nameTextView = (TextView) findViewById(R.id.nameText);
         emailTextView = (TextView) findViewById(R.id.emailText);
-        getPermissionToReadPhoneState();
-        Button fetchButton = (Button) findViewById(R.id.button);
-
+        deviceTextView = (TextView) findViewById(R.id.deviceText);
+        statusTextView = (TextView) findViewById(R.id.statusText);
+        fetchButton = (Button) findViewById(R.id.button);
+        settingsButton = (Button) findViewById(R.id.settingsButton);
+        postImeiOnScreen();
         fetchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 printJsonFromServer();
             }
         });
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createLoginview();
+            }
+        });
     }
 
-    private void printJsonFromServer()
-    {
-        System.out.println("Start");
-        ServerConnection serverCon = new ServerConnection();
-        serverCon.fetch("Hej", "aa");
-        System.out.println("Past start");
-        synchronized(serverCon.retrievedUpdates)
-        {
-            System.out.println("Wow");
-            if(serverCon.retrievedUpdates == null) {
-                try {
-                    System.out.println("1");
-                    serverCon.retrievedUpdates.wait();
-                    System.out.println("2");
-                } catch (InterruptedException e) {
-                    System.out.println("Failed in printJsonFromServer func: " + e.getMessage());
-                }
-            }
-            else
-            {
-                JSONObject retrievedInfo = serverCon.getRetrievedUpdates();
-                try {
-                    System.out.println("Is it null now?: " + retrievedInfo);
-                    nameTextView.append(retrievedInfo.getString("name"));
-                    emailTextView.append(retrievedInfo.getString("email"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+    /**
+     * Creates a server connection and fetches an user which is then printed out on screen
+     */
+    private void printJsonFromServer() {
+        new fetchUpdates().execute();
 
-//        notifyAll();
     }
 
-    public void getPermissionToReadPhoneState()
-    {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED)
-        {
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE))
-            {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-            }
-            else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 1);
-            }
+    private void postImeiOnScreen() {
+        final String str = "Imei number: " + imei;
+        imeiTextView.setText(str);
+
+    }
+
+    /**
+     *Sets the specific error code that is received from the web-server when trying to retrieve updates
+     */
+    private void setErrorCode(String errorcode) {
+        this.ErrorCode = errorcode;
+    }
+
+    /**
+     * Sets IMEI and friendly Name on the phone
+     */
+    private void setDeviceInfo() {
+        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        imei = telephonyManager.getDeviceId();
+        BluetoothAdapter myDevice = BluetoothAdapter.getDefaultAdapter();
+        phoneName = myDevice.getName();
+
+    }
+
+    private class fetchUpdates extends AsyncTask<String, Integer, User> {
+
+        @Override
+        protected void onPreExecute() {
+            fetchButton.setEnabled(false);
+            statusTextView.setText("Status: Fetching data from server");
         }
-        else
-        {
-            TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-            final String str = "Imei number: " + telephonyManager.getDeviceId();
-            imeiTextView.setText(str);
+
+        @Override
+        protected User doInBackground(String... imeis) {
+
+            final ServerConnection serverCon = new ServerConnection(getBaseContext());
+            try {
+                User user = serverCon.fetchUser(imei);
+                if (user != null) {
+                    if (!user.getDevices().isEmpty()) {
+                        ArrayList<Application> apps = user.getDevices().get(0).getApplications();
+                        for (Application app : apps) {
+                            System.out.println(app.getFriendlyName());
+                        }
+                        AppParser appParser = new AppParser(apps, getBaseContext());
+                        appParser.parse();
+                    }
+                }
+                return user;
+            } catch (Exception e) {
+                setErrorCode(e.getMessage());
+            }
+
+
+            return null;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(User user) {
+            if (user != null) {
+                nameTextView.setText("Name: " + user.getName());
+                emailTextView.setText("Email: " + user.getEmail());
+                statusTextView.setText("Status: Updates downloaded at " + DateFormat.getDateTimeInstance().format(new Date()));
+                if (!user.getDevices().isEmpty()) {
+                    deviceTextView.setText("Device: " + user.getDevices().get(0).getName());
+                }
+            } else {
+                nameTextView.setText("");
+                emailTextView.setText("");
+                deviceTextView.setText("");
+                if (ErrorCode.equals("304")) {
+                    statusTextView.setText("Status: \"No new data\" Response Code: " + ErrorCode);
+                } else {
+                    statusTextView.setText("Status: Response Code: " + ErrorCode);
+                }
+            }
+            fetchButton.setEnabled(true);
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-    {
-        switch(requestCode)
-        {
-            case 1:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                    final String str = "Imei number: " + telephonyManager.getDeviceId();
-                    imeiTextView.setText(str);
-                }
-                else
-                {
-                    System.out.println("Fail!");
-                }
 
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    private class firstSigning extends AsyncTask<String, Integer, Void> {
+        @Override
+        protected Void doInBackground(String... imeis) {
+            final ServerConnection serverCon = new ServerConnection(getBaseContext());
+            try {
+                serverCon.firstConnectionForPhone(imei, phoneName, URL.getText().toString());
+            } catch (Exception e) {
+                setErrorCode(e.getMessage());
+            }
+
+            return null;
         }
     }
 }
+
+
