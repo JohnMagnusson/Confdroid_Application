@@ -23,5 +23,4 @@ public class DeviceManagementPolicy
     {
         return policy;
     }
-
 }
